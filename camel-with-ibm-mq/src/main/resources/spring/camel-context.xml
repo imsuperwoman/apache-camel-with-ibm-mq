@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:encryption="http://www.jasypt.org/schema/encryption" 
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.1.xsd
+		http://camel.apache.org/schema/spring
+		http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<context:component-scan base-package="com.awf.spring" />
+	<context:component-scan base-package="com.asp.spring" />
+	<context:component-scan base-package="com.asp.proxy.tcp" />
+	<context:component-scan base-package="com.tcp.common" />
+
+	<camel:endpoint id="aspToAscOutgoingMessage" uri="seda:aspToAscOutgoingMessage?concurrentConsumers={{AspToAscConsumerConcurrentConsumer}}&amp;timeout=0" />
+	<camel:endpoint id="ascToAspIncomingMessage" uri="seda:ascToAspIncomingMessage?timeout=0" />
+
+	<bean id="asccendTcpRequestProcessorConfig" 	class="com.asp.spring.camel.AsccendTcpRequestProcessorConfig">
+		<constructor-arg name="mode" value="IGNORE" />
+		<constructor-arg name="asccendTimeoutValue" value="30" />
+		<constructor-arg name="errorCode" value="980" />
+	</bean>
+	
+	<bean id="logQuery" class="io.hawt.log.log4j.Log4jLogQuery"
+      lazy-init="false" scope="singleton"
+      init-method="start" destroy-method="stop"/>
+	
+	<bean id="environmentVariablesConfiguration"
+		class="org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig">
+		<property name="algorithm" value="PBEWithMD5AndDES" />
+		<property name="password" value="changeit" />
+	</bean>
+	
+	<bean id="configurationEncryptor" class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+		<property name="config" ref="environmentVariablesConfiguration" />
+	</bean>
+
+	<bean
+		class="org.jasypt.spring31.properties.EncryptablePropertyPlaceholderConfigurer">
+		<constructor-arg ref="configurationEncryptor" />
+		<property name="locations">
+			<list>
+				<value>classpath:config.properties</value> 
+				<value>classpath:wmq.properties</value>
+			</list>
+		</property>
+	<!-- 	<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="ignoreResourceNotFound" value="true" /> -->
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+	</bean>
+
+	<bean class="com.ibm.mq.jms.MQQueueConnectionFactory" id="queueFactoryTPP01">
+		<property name="transportType" value="1" />
+		<property name="hostName" value="${ibm.mq.host}" />
+		<property name="port" value="${ibm.mq.port.TPP01}" />
+		<property name="queueManager" value="${ibm.qm.TPP01}" />
+		<property name="channel" value="${ibm.channel}" />
+	    <property name="sSLCipherSuite" value="${ibm.SSL.Cipher}" />  
+		<property name="SSLFipsRequired" value="false" />		
+	</bean>
+	
+    <bean id="beanBuilder" class="com.tcp.common.BeanBuilder" />
+	<bean id="aspToAscMessageProcessor" class="com.asp.proxy.tcp.AspToAscTcpMessageProcessor" />
+	<bean class="com.jms.ibm.destination.CustomDynamicDestinationResolver" id="customDynamicDestinationResolver"/>
+        
+	<camelContext xmlns="http://camel.apache.org/schema/spring"  id="aspWsCamelContext" typeConverterStatisticsEnabled="true">
+		<propertyPlaceholder id="configProperties" 	location="wmq.properties,config.properties" />
+		
+		<route id="queueTPP01">
+			<from id="incomingTPP01"
+				uri="jms:queue:{{ibm.qm.TPP01.REQ}}?connectionFactory=#queueFactoryTPP01&amp;username=mqm&amp;password=&amp;
+                	testConnectionOnStartup=true&amp;concurrentConsumers={{concurrent.Consumers}}&amp;
+                	errorHandlerLoggingLevel=INFO&amp;destinationResolver=#customDynamicDestinationResolver&amp;
+                	requestTimeout=60000&amp;replyTo={{ibm.qm.TPP01.RES}}" />
+				<to uri="direct:writeToTcp" />
+		</route>
+
+		<route id="writeToTcp">
+			<from uri="direct:writeToTcp" />
+			<to uri="bean:beanBuilder?method=jmsRequest" /> 
+			<convertBodyTo type="com.asp.proxy.tcp.AscTcpRequest" />
+			<doTry>
+				<to ref="aspToAscOutgoingMessage" />					
+			<doCatch>
+					<exception>java.lang.Exception</exception>
+					<log message="Writing to TCP failed" loggingLevel="ERROR" />
+					<to uri="bean:beanBuilder?method=tcpError" /> 
+				</doCatch>
+			</doTry>	
+		</route>
+		
+		<route id="aspToAscOutgoingRoute">		    
+			<from ref="aspToAscOutgoingMessage"/>
+			<process ref="aspToAscMessageProcessor" />
+		</route>
+		
+	   <route id="aspHealthCheck" startupOrder="10">
+			<from uri="jetty:http://0.0.0.0:{{AspHttpPortNumber}}/{{AspContextPath}}/health-check" />
+			<setBody><simple>SUCCESS</simple></setBody>
+		</route>
+	</camelContext>
+	
+	<!-- SSL Truststore Setting Begin -->
+	<bean id="trustStorePath"
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetClass" value="java.lang.System" />
+		<property name="targetMethod" value="setProperty" />
+		<property name="arguments">
+			<list>
+				<value>javax.net.ssl.trustStore</value>
+				<value>${keyStoreParameters.resource}</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="trustStorePassword"
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetClass" value="java.lang.System" />
+		<property name="targetMethod" value="setProperty" />
+		<property name="arguments">
+			<list>
+				<value>javax.net.ssl.trustStorePassword</value>
+				<value>${keyStoreParameters.password}</value>
+			</list>
+		</property>
+	</bean>
+ 
+	<bean id="keyStorePath"
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetClass" value="java.lang.System" />
+		<property name="targetMethod" value="setProperty" />
+		<property name="arguments">
+			<list>
+				<value>javax.net.ssl.keyStore</value>
+				<value>${keyStoreParameters.resource}</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="keyStorePassword"
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetClass" value="java.lang.System" />
+		<property name="targetMethod" value="setProperty" />
+		<property name="arguments">
+			<list>
+				<value>javax.net.ssl.keyStorePassword</value>
+				<value>${keyStoreParameters.password}</value>
+			</list>
+		</property>
+	</bean>
+	<!--SSL Truststore Setting End -->
+</beans>
+

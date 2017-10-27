@@ -1,0 +1,54 @@
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+
+	<id>dist</id>
+	<!--<id>${project.version}-dist</id>-->
+	<formats>
+		<format>zip</format>
+	</formats>
+	
+	<files>
+		<file>
+			<source>${project.build.directory}/${project.artifactId}.war</source>
+			<outputDirectory>/install</outputDirectory>
+		</file>
+		
+	</files>
+	
+	<fileSets>
+		
+		<fileSet>
+			<directory>src/main/resources/documentation</directory>
+			<outputDirectory>documentation</outputDirectory>
+			<excludes>
+				<exclude>*.docx</exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
+			<directory>src/main/resources</directory>
+			<outputDirectory>install</outputDirectory>
+			<includes>
+				<include>startAsp.bat</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>src/main/resources/utilities</directory>
+			<outputDirectory>install/utilities</outputDirectory>
+			<includes>
+				<include>**/*.bat</include>
+				<include>**/jasypt/**</include>
+			</includes>
+		</fileSet>
+		
+		<fileSet>
+			<directory>${project.build.directory}/bin</directory>
+			<outputDirectory>install/bin</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${project.build.directory}/jars</directory>
+			<outputDirectory>install/jars</outputDirectory>
+		</fileSet>
+	</fileSets>
+</assembly>

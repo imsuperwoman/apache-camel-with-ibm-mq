@@ -1,0 +1,19 @@
+<?page title="Welcome to BizFuse ASP!" contentType="text/html;charset=UTF-8"?>
+<?header name="X-UA-Compatible" value="IE=edge"?>
+<?meta http-equiv="X-UA-Compatible" content="IE=edge"?>
+<?meta name="viewport" content="width=device-width, initial-scale=1"?>
+<zk>
+<window border="none" xmlns:n="native">
+	<n:div class="container">
+		<div sclass="page-header" style="margin-top:20px">
+			<n:h1>Welcome to BizFuse ASP!</n:h1>
+		</div>
+		<div>
+			<label value="Redirecting to ..." />
+		</div>
+	</n:div>
+</window>
+<zscript><![CDATA[
+	execution.sendRedirect("/login");
+]]></zscript>
+</zk>

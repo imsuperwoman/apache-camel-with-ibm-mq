@@ -1,0 +1,2 @@
+com.worldline.asp.spring.camel.converter.AscTcpRequestConverter
+com.worldline.asp.spring.camel.converter.AscTcpResponseToStringConverter

@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+	http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.github</groupId>
+	<artifactId>camel-with-ibm-mq</artifactId>
+	<name>Camel With IBM MQ</name>
+	<packaging>war</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<properties>
+		<java.version>1.8</java.version>
+		<camel.version>2.19.0</camel.version>
+		<commons-io.version>2.4</commons-io.version>
+		<springframework.version>4.1.6.RELEASE</springframework.version>
+		<slf4j.version>1.7.7</slf4j.version>   
+		<log4j.version>1.2.17</log4j.version> 
+		<jackson.version>2.8.9</jackson.version>
+		<ibmmq.version>7.5.0.2</ibmmq.version>
+	</properties>
+
+	<prerequisites>
+		<maven>3.1.0</maven>
+	</prerequisites>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-core</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-spring</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-bindy</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-jms</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-netty4</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+    	<dependency>
+		    <groupId>org.apache.camel</groupId>
+		    <artifactId>camel-jetty</artifactId>
+		    <version>${camel.version}</version>
+		</dependency>
+				
+		<dependency>
+		  <groupId>javax.jms</groupId>
+		  <artifactId>jms</artifactId>
+		  <version>1.1</version>
+		</dependency>  
+        <!-- IBM MQ -->
+	    <dependency>
+		  <groupId>com.ibm.mq</groupId>
+		  <artifactId>mq-jms</artifactId>
+		  <version>${ibmmq.version}</version>
+		</dependency>
+		<dependency>
+		  <groupId>com.ibm.mq</groupId>
+		  <artifactId>mq</artifactId>
+		  <version>${ibmmq.version}</version>
+		</dependency>
+	    <dependency>
+  			<groupId>com.ibm.mq</groupId>
+ 		 	<artifactId>mq-commonservices</artifactId>
+  			<version>${ibmmq.version}</version>
+		</dependency>
+	    <dependency>
+  			<groupId>com.ibm.mq</groupId>
+  			<artifactId>dhbcore</artifactId>
+   			<version>1.4.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ibm.mq</groupId>
+			<artifactId>mq-headers</artifactId>
+			<version>${ibmmq.version}</version>
+		</dependency>
+	    <dependency>
+  			<groupId>com.ibm.mq</groupId>
+  			<artifactId>mq-jmqi</artifactId>
+  			<version>${ibmmq.version}</version>
+		</dependency>
+		
+		
+      <!--  spring -->
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-web</artifactId>
+		    <version>${springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${springframework.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-jms</artifactId>
+		    <version>${springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${springframework.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>${springframework.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>commons-codec</groupId>
+		    <artifactId>commons-codec</artifactId>
+		    <version>1.9</version>
+		</dependency>		
+		<dependency>
+			<groupId>org.beanio</groupId>
+			<artifactId>beanio</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+		
+		<!-- Joda-Time -->
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.7</version>
+		</dependency>
+	<!-- 	<dependency>
+			<groupId>org.jadira.usertype</groupId>
+			<artifactId>usertype.core</artifactId>
+			<version>3.2.0.GA</version>
+		</dependency> -->
+		
+        <!-- howtio plugin -->
+	    <dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson.version}</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>com.fasterxml.jackson.core</groupId>
+	      <artifactId>jackson-annotations</artifactId>
+	      <version>${jackson.version}</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>com.fasterxml.jackson.core</groupId>
+	      <artifactId>jackson-databind</artifactId>
+	      <version>${jackson.version}</version>
+	    </dependency> 
+         
+            <!-- logging -->
+		    <dependency>
+		      <groupId>log4j</groupId>
+		      <artifactId>log4j</artifactId>
+		      <version>${log4j.version}</version>
+		    </dependency>
+		    <dependency>
+		      <groupId>org.slf4j</groupId>
+		      <artifactId>slf4j-api</artifactId>
+		      <version>${slf4j.version}</version>
+		    </dependency>
+		    <dependency>
+		      <groupId>org.slf4j</groupId>
+		      <artifactId>slf4j-log4j12</artifactId>
+		      <version>${slf4j.version}</version>
+		    </dependency>
+     
+		<!-- utilities -->
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+			<version>4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commons-io.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>18.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.lambdaj</groupId>
+			<artifactId>lambdaj</artifactId>
+			<version>2.3.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jasypt</groupId>
+			<artifactId>jasypt-spring31</artifactId>
+			<version>1.9.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-dbcp2</artifactId>
+			<version>2.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>6.9.10</version>
+			<scope>test</scope>
+		</dependency>
+	    <dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<!-- we do not want version in the WAR name -->
+		<finalName>${project.artifactId}</finalName>
+
+		<defaultGoal>install</defaultGoal>
+		<resources>
+            <resource>
+              <directory>src/main/resources</directory>
+              <filtering>true</filtering>
+              <includes>
+                <include>**/version.properties</include>
+              </includes>
+            </resource>
+            <resource>
+              <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                  <exclude>**/version.properties</exclude>
+                </excludes>
+            </resource>
+		
+			<resource>
+			  <directory>src/main/resources</directory>
+			  <excludes>
+				 <exclude>**/startAsp.bat</exclude>
+				 <exclude>**/utilities/**</exclude>
+				 <exclude>**/documentation/**</exclude>
+			  </excludes>
+			</resource>			
+		 </resources> 
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<outputEncoding>UTF-8</outputEncoding>
+					<argLine>-Dfile.encoding=UTF-8</argLine>
+					<encoding>${project.build.sourceEncoding}</encoding>					
+				</configuration>
+			</plugin>
+		<!-- Add Resources to the WAR-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<webResources>
+						<resource>
+							<directory>target/${project.artifactId}/</directory>
+							<includes>
+								<include>**/*.*</include>
+							</includes>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>package-app</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>assembly.xml</descriptor>
+							</descriptors>
+						 </configuration>
+					</execution>
+				</executions>
+			</plugin>
+			 <plugin>
+			    <groupId>org.apache.camel</groupId>
+			    <artifactId>camel-maven-plugin</artifactId>
+			    <version>${camel.version}</version>
+			    <configuration>
+			      <!-- turn on reload when the XML file is updated in the source code -->
+			      <fileWatcherDirectory>src/main/resources/spring</fileWatcherDirectory>
+			    </configuration>
+			  </plugin>
+		</plugins> 
+	</build>
+
+</project>
+
